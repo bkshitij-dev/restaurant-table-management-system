@@ -1,0 +1,48 @@
+package com.example.rtms.service.impl;
+
+import com.example.rtms.dto.request.LoginRequestDto;
+import com.example.rtms.dto.request.UserRequestDto;
+import com.example.rtms.model.Role;
+import com.example.rtms.model.User;
+import com.example.rtms.repository.UserRepository;
+import com.example.rtms.service.AuthenticationService;
+import com.example.rtms.service.RoleService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+
+/*
+ * @author Kshitij
+ * @created 31-Aug-2024
+ */
+
+@Service
+@RequiredArgsConstructor
+public class AuthenticationServiceImpl implements AuthenticationService {
+
+    private final RoleService roleService;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final AuthenticationManager authenticationManager;
+
+    public void register(UserRequestDto request) {
+        User user = User.builder()
+                .name(request.getName())
+                .email(request.getEmail())
+                .username(request.getUsername())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .build();
+        Role role = roleService.findByName("CUSTOMER");
+        user.addRole(role);
+        userRepository.save(user);
+    }
+
+    public User login(LoginRequestDto request) {
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(request.getEmailOrUsername(), request.getPassword()));
+        return userRepository.findByEmailOrUsername(request.getEmailOrUsername(), request.getEmailOrUsername())
+                .orElseThrow();
+    }
+}
