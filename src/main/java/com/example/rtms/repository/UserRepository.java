@@ -15,7 +15,9 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    Optional<User> findByEmailOrUsername(String email, String username);
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.roles WHERE u.email = :emailOrUsername " +
+            "OR u.username = :emailOrUsername")
+    Optional<User> findByEmailOrUsername(String emailOrUsername);
 
     @Query(value = "SELECT EXISTS (\n" +
             "    SELECT 1\n" +

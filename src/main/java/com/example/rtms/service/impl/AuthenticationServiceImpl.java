@@ -56,8 +56,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     public User login(LoginRequestDto request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmailOrUsername(), request.getPassword()));
-        return userRepository.findByEmailOrUsername(request.getEmailOrUsername(), request.getEmailOrUsername())
+        return userRepository.findByEmailOrUsername(request.getEmailOrUsername())
                 .orElseThrow();
+    }
+
+    public Long count() {
+        return userRepository.count();
     }
 
     private boolean existsByEmailOrUsername(String email, String username) {

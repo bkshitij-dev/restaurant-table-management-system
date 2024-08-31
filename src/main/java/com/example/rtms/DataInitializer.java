@@ -25,7 +25,9 @@ public class DataInitializer implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         createRoles();
-        createUsers();
+        if (authenticationService.count() <= 0) {
+            createUsers();
+        }
     }
 
     private void createRoles() {

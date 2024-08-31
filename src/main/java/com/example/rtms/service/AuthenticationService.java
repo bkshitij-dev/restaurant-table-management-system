@@ -17,4 +17,6 @@ public interface AuthenticationService {
     void createUser(UserRequestDto request, List<String> roles);
 
     User login(LoginRequestDto request);
+
+    Long count();
 }
