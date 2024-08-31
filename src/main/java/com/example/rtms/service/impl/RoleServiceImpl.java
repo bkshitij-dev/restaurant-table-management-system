@@ -1,5 +1,6 @@
 package com.example.rtms.service.impl;
 
+import com.example.rtms.enums.RoleType;
 import com.example.rtms.model.Role;
 import com.example.rtms.repository.RoleRepository;
 import com.example.rtms.service.RoleService;
@@ -17,7 +18,15 @@ public class RoleServiceImpl implements RoleService {
 
     private final RoleRepository roleRepository;
 
-    public Role findByName(String name) {
-        return roleRepository.findByName(name);
+    @Override
+    public Role findOrCreateByName(String name) {
+        Role role = roleRepository.findByName(name);
+        if (role == null) {
+            role = Role.builder()
+                    .name(RoleType.valueOf(name))
+                    .build();
+            roleRepository.save(role);
+        }
+        return role;
     }
 }

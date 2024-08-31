@@ -8,5 +8,5 @@ import com.example.rtms.model.Role;
  */
 public interface RoleService {
 
-    Role findByName(String name);
+    Role findOrCreateByName(String name);
 }

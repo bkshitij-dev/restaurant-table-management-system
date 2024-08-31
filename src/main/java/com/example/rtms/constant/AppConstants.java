@@ -20,4 +20,8 @@ public final class AppConstants {
     public static final String SUCCESS_REMOVE = "Data removed successfully";
 
     public static final int MIN_PASSWORD_LENGTH = 6;
+
+    public static final String ROLE_ADMIN = "ADMIN";
+    public static final String ROLE_STAFF = "STAFF";
+    public static final String ROLE_CUSTOMER = "CUSTOMER";
 }

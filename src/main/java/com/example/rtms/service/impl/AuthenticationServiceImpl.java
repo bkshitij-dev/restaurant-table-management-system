@@ -1,7 +1,9 @@
 package com.example.rtms.service.impl;
 
+import com.example.rtms.constant.AppConstants;
 import com.example.rtms.dto.request.LoginRequestDto;
 import com.example.rtms.dto.request.UserRequestDto;
+import com.example.rtms.exception.AppException;
 import com.example.rtms.model.Role;
 import com.example.rtms.model.User;
 import com.example.rtms.repository.UserRepository;
@@ -12,6 +14,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Arrays;
+import java.util.List;
 
 /*
  * @author Kshitij
@@ -28,14 +33,23 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final AuthenticationManager authenticationManager;
 
     public void register(UserRequestDto request) {
+        if (existsByEmailOrUsername(request.getEmail(), request.getUsername())) {
+            throw new AppException("User already exists");
+        }
+        createUser(request, List.of(AppConstants.ROLE_CUSTOMER));
+    }
+
+    @Override
+    public void createUser(UserRequestDto request, List<String> roles) {
         User user = User.builder()
                 .name(request.getName())
                 .email(request.getEmail())
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .build();
-        Role role = roleService.findByName("CUSTOMER");
-        user.addRole(role);
+        roles.forEach(role -> {
+            user.addRole(roleService.findOrCreateByName(role));
+        });
         userRepository.save(user);
     }
 
@@ -44,5 +58,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 new UsernamePasswordAuthenticationToken(request.getEmailOrUsername(), request.getPassword()));
         return userRepository.findByEmailOrUsername(request.getEmailOrUsername(), request.getEmailOrUsername())
                 .orElseThrow();
+    }
+
+    private boolean existsByEmailOrUsername(String email, String username) {
+        return userRepository.existsByEmailOrUsername(email, username);
     }
 }
